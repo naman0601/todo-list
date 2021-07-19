@@ -1,95 +1,97 @@
-//grab the form and prevent default submission behavior
-let form = document.getElementById('form');
-
-//items array for new items
-let items = [];
-
-//function call to check local storage and display items, if any.
-displayLocalStorage();
-
-//submit new items to todolist
-form.addEventListener('submit', function(e){
+window.onload = () => {
+    const form1 = document.querySelector("#addForm");
+  
+    let items = document.getElementById("items");
+    let submit = document.getElementById("submit");
+  
+    let editItem = null;
+  
+    form1.addEventListener("submit", addItem);
+    items.addEventListener("click", removeItem);
+};
+  
+function addItem(e) {
     e.preventDefault();
-    //grab input from
-    let todoInput = document.getElementById('todo-input').value;
-    //if input is blank do nothing
-    if (todoInput === ""){
-        alert('Please enter valid input!');
+  
+    if (submit.value != "Submit") {
+        console.log("Hello");
+  
+        editItem.target.parentNode.childNodes[0].data
+            = document.getElementById("item").value;
+  
+        submit.value = "Submit";
+        document.getElementById("item").value = "";
+  
+        document.getElementById("lblsuccess").innerHTML
+            = "Text edited successfully";
+  
+        document.getElementById("lblsuccess")
+                        .style.display = "block";
+  
+        setTimeout(function() {
+            document.getElementById("lblsuccess")
+                            .style.display = "none";
+        }, 3000);
+  
+        return false;
     }
-    else {
-        //display items
-        displayItems(todoInput);
-        //Place todoItem in localStorage
-        storeItem(todoInput);
-        //Clear the todo item field
-        document.getElementById('todo-input').value = '';
-        //add an event listener to the delete button
-        addDeleteFunction(todoInput);
+  
+    let newItem = document.getElementById("item").value;
+    if (newItem.trim() == "" || newItem.trim() == null)
+        return false;
+    else
+        document.getElementById("item").value = "";
+  
+    let li = document.createElement("li");
+    li.className = "list-group-item";
+  
+    let deleteButton = document.createElement("button");
+  
+    deleteButton.className = 
+        "btn-danger btn btn-sm float-right delete";
+  
+    deleteButton.appendChild(document.createTextNode("Delete"));
+  
+    let editButton = document.createElement("button");
+  
+    editButton.className = 
+            "btn-success btn btn-sm float-right edit";
+  
+    editButton.appendChild(document.createTextNode("Edit"));
+  
+    li.appendChild(document.createTextNode(newItem));
+    li.appendChild(deleteButton);
+    li.appendChild(editButton);
+  
+    items.appendChild(li);
+}
+  
+function removeItem(e) {
+    e.preventDefault();
+    if (e.target.classList.contains("delete")) {
+        if (confirm("Are you Sure?")) {
+            let li = e.target.parentNode;
+            items.removeChild(li);
+            document.getElementById("lblsuccess").innerHTML
+                = "Text deleted successfully";
+  
+            document.getElementById("lblsuccess")
+                        .style.display = "block";
+  
+            setTimeout(function() {
+                document.getElementById("lblsuccess")
+                        .style.display = "none";
+            }, 3000);
+        }
     }
-});
-
-//function to store items in local storage
-function storeItem(item){
-    items.push(item);
-    localStorage.setItem('item',JSON.stringify(items));
-};
-
-//function to display items in the DOM
-function displayItems(todoInput){
-    //create a li tag for the element
-    let todoItem = document.createElement('li');
-    
-    todoItem.innerHTML = `${todoInput}<div class="delete-item">Delete</div>`;
-    //Display the todo item
-    let todoList = document.querySelector('ul');
-    todoList.appendChild(todoItem);
-};
-
-function displayLocalStorage(){
-    let storage = localStorage.getItem('item');
-    
-    if (storage === null){
-        items = [];
-    } else {
-        let storageParsed = JSON.parse(storage);
-        storageParsed.forEach(function(storageItem){
-            displayItems(storageItem);
-        })
-    };
-};
-
-function addDeleteFunction(todoInput){
-    
-    let deleteButton = document.querySelectorAll('.delete-item');
-    
-    deleteButton.forEach(function(button, index){
-        button.addEventListener('click', function(e){
-            console.log(e.path[1].childNodes);
-           
-            //remove index number from localStorage
-           let deletedStorage = localStorage.getItem('item');
-           let deletedStorageParsed = JSON.parse(deletedStorage);
-
-                deletedStorageParsed.splice(index, 1);
-                console.log(deletedStorageParsed);
-                localStorage.setItem('item',JSON.stringify(deletedStorageParsed));
-            if(deletedStorageParsed.length === 0){
-                let todoList = document.querySelector('ul');
-                todoList.innerHTML = '';
-                let todoItem = document.createElement('li');
-                todoItem.innerHTML = `No more todos!`;
-                
-                todoList.appendChild(todoItem);
-                displayLocalStorage();
-               
-                
-                
-
-            } else {
-                localStorage.setItem('item',JSON.stringify(deletedStorageParsed));
-            }
-            
-
-        })
-    })
+    if (e.target.classList.contains("edit")) {
+        document.getElementById("item").value =
+            e.target.parentNode.childNodes[0].data;
+        submit.value = "EDIT";
+        editItem = e;
+    }
+}
+  
+function toggleButton(ref, btnID) {
+    document.getElementById(btnID).disabled = false;
 }
